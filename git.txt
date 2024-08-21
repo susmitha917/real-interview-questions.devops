@@ -1,0 +1,228 @@
+Git
+--------------
+GitOps -> everything should be inside git, no manual process
+
+Git --> single source of truth, version control
+
+Git
+-----------------
+
+created repo in console
+clone the repo
+add authentication
+do changes
+git add . --> add code to temp area
+git commit -m "some" --> commit the code to local repo
+git push --> push the code to central/remote repo
+
+push commit to GitHub
+---------------------
+Shift Left
+---------------
+clone the code
+compile the code
+unit testing
+scan the code --> DevSecOps
+	Static source code analysis --> SonarQube
+	SAST --> Security point of view
+	DAST --> Dynamic application security testing
+	Open source scanning -->
+	docker image scanning --> AWS ECR
+
+	
+Git Branching?
+Git branching is like creating a separate workspace within a project where you can work on new features or fixes without affecting the main project. 
+You can switch between these workspaces, merge your changes when ready, and keep everything organized.
+
+I can create a new branch with git branch <branch_name> and switch to it using git checkout <branch_name> or git switch <branch_name>.
+To work on a feature or fix, I'd typically create and switch to a branch with git checkout -b <branch_name> or git switch -c <branch_name>.
+After completing my work, I merge the branch back into the main branch using git merge <branch_name>.
+Once merged, I clean up by deleting the branch locally with git branch -d <branch_name> and remotely with git push origin --delete <branch_name>.
+
+Example:
+Start with the main branch (usually called main or master): git checkout main
+Create a new branch for a feature you're working on: git checkout -b feature-xyz
+Work on the feature in the feature-xyz branch. Make changes and commit them: git add .
+git commit -m "Add new feature XYZ"
+Switch back to the main branch: git checkout main
+Merge the feature branch back into the main branch: git merge feature-xyz
+Delete the feature branch once merged (optional): git branch -d feature-xyz
+
+Merge:
+------------------------
+Definition: Combines the changes from one branch into another.
+Command: git merge <branch_name>
+Result: Creates a new commit that joins the histories of both branches.
+
+Merging
+---------
+create another branch
+do the changes in that branch
+raise PR
+get the approval
+then merge it
+
+merge gives us a new merge which has 2 parents, we can clearly see the history
+
+Rebase:
+-----------------------
+Definition: Moves or "replays" commits from one branch onto another, effectively changing the base of the branch.
+
+Rebase
+---------
+rebase --> change the base
+no extra commit
+commit id are changed
+no history is preserved, it is rewritten as if it is done in main branch
+looks clean, linear history
+
+single branch --> multiple persons are working --> prefer merge
+if you want to keep the history --> prefer merge
+
+single branch --> single person --> prefer rebase
+if you dont want history --> prefer rebase
+if you want clean structure --> prefer rebase
+
+SCENARIO:
+-----------------------------
+You have two branches: main and feature-xyz.
+You've been working on feature-xyz, but some updates were made to main after you branched off.
+
+1.Start on the feature-xyz branch: git checkout feature-xyz
+You've made several commits on feature-xyz.
+2.Meanwhile, someone else has updated the main branch with new commits. Your feature-xyz branch is now behind main.
+3.Rebase feature-xyz onto main: 
+git checkout feature-xyz
+git rebase main
+
+What happens:
+Git takes the new commits from main and applies them before your commits on feature-xyz.
+Your commits are "rebased" on top of the updated main branch.
+
+During a git rebase, Git moves your changes from the feature-xyz branch to be on top of the latest changes from the main branch. 
+It’s like replaying your work as if you had started from the current state of main, making the history look like a straight line. This helps avoid extra merge 
+commits and keeps the commit history clean.
+
+Before Rebase:
+main branch has commits: M1 → M2 → M3
+feature-xyz branch has commits: M1 → F1 → F2 → F3
+Here, M1 is the common ancestor (the commit where the feature-xyz branch originally diverged from main), M2 and M3 are new commits added to main after feature-xyz branched off, and F1, F2, and F3 are the commits you made on feature-xyz.
+
+During Rebase:
+Git Moves feature-xyz to M3:
+
+Git temporarily rewinds the feature-xyz branch back to M1, removing F1, F2, and F3 from the branch.
+Then, it updates feature-xyz to point to M3, the latest commit on main. Now, your feature-xyz branch is aligned with the main branch, as if you had branched off from M3.
+Reapply Your Changes:
+
+After aligning feature-xyz with main, Git starts reapplying your commits (F1, F2, F3) on top of the new M3 commit.
+Git does this in order, effectively replaying your changes as if they were made after the updates to main.
+After Rebase:
+main branch remains: M1 → M2 → M3
+feature-xyz branch now looks like: M1 → M2 → M3 → F1' → F2' → F3'
+Here, F1', F2', and F3' are the same changes as F1, F2, and F3, but they are now applied on top of M3.
+
+Summary:
+Before rebase: feature-xyz was behind main, based on an older commit M1.
+After rebase: feature-xyz is now up-to-date with main and has all your changes applied on top of the latest state of main.
+
+
+MERGE VS REBASE:
+-------------------
+Key Differences:
+
+History: Merge maintains a record of branch divergence and integration. Rebase rewrites history to appear as if the work was done sequentially.
+Merge Commits: Merge creates a merge commit, while rebase does not.
+Conflict Resolution: Both can have conflicts, but during a rebase, you must resolve conflicts for each commit being applied.
+Summary:
+
+Merge: Use to combine changes and preserve the context of branch development.
+Rebase: Use to create a clean, linear history by applying changes on top of the latest branch state.
+
+conflicts
+----------------
+if git findsout 2 different content in the same line, it cant take decission. people who wrote the code should sit together and resolve conflict
+
+if main branch is moved forward
+another branch is trying to merge the changes, then conflict will come
+
+
+
+BRANCHING STRATEGY:
+----------------------------------------------------------------------------
+
+A branching strategy is a workflow approach to managing branches in a Git repository. It helps organize development work, control releases, 
+and manage collaboration in a project. 
+
+main --> Production
+we create feature branch from main branch
+they do the development and deploy to DEV environment
+if that is success, they will raise PR, if the PR is approve they merge changes to main branch.
+then we perform QA and UAT deployment.
+once we get QA and UAT sign off, we will deploy to PROD through CR process.
+
+CR --> change request process
+
+what are the changes in the release
+what is the date and time of release
+if failure, how can we rollback? what is the plan?
+any downtime? --> yes/no
+QA testing
+UAT testing
+Scans
+Delivery manager from TCS
+QA manager
+Client approval
+
+deployment window --> 10-JUN-2024 03:00-04:00 AM
+
+deployment failed, CR failed
+
+why it is failed, stop the next sprint
+
+RCA --> Root cause analysis
+
+
+Branching Strategy:
+-----------------------------
+Main Branches:
+main: Stable, production-ready code.
+develop: Integration branch for features before release.
+
+Feature Branches:
+Purpose: Develop new features or fixes.
+Example: feature/login-feature
+Flow: Branches from develop, merges back into develop.
+
+Release Branches:
+Purpose: Prepare code for release.
+Example: release/1.0
+Flow: Branches from develop, merges into main and develop.
+
+Hotfix Branches:
+Purpose: Quickly fix critical issues in main.
+Example: hotfix/urgent-fix
+Flow: Branches from main, merges into main and develop.
+
+Gitflow:
+Structure: Uses main, develop, feature, release, and hotfix branches.
+Use Case: Ideal for structured, large-team development.
+
+
+GIT RESET:
+Purpose: undo the changes, it is destructive operation.it will change the history and commit id
+Types:
+Soft: reset the commits,, Keeps changes in the staging area.
+Mixed: reset the commits,  but will not  Keeps changes in the staging area.
+Hard: reset the commits, remove changes from local commit, workspace  and staging area.
+
+git reset --soft/mixed/hard <commit>
+
+Revert:
+Purpose: Create a new commit that undoes the changes of a specific commit, preserving history.
+Command:git revert <commit>
+Usage: Safe way to undo changes without altering commit history.
+
+GIT SQUASH, STASH, CHERRY PICK
+
+

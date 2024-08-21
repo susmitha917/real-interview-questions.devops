@@ -1,0 +1,415 @@
+1.What is the difference between a hard link and a soft link in Linux?
+
+Hard Link
+Definition: A hard link is an additional name for an existing file on the same filesystem.
+Link to: The actual data on the disk (the inode).
+Independence: All hard links to a file are equally valid; deleting one does not affect the others.
+File Count: Increment the link count of the file's inode.
+Location: Must reside on the same filesystem as the original file.
+Use Case: Ideal for creating backups or ensuring multiple references to the same data without duplicating the data.
+
+Soft Link (Symbolic Link)
+Definition: A soft link is a pointer or shortcut to another file or directory.
+Link to: The pathname of the target file or directory.
+Dependence: If the target file is deleted, the soft link becomes a broken link and no longer works.
+File Count: Does not increment the link count of the file's inode.
+Location: Can cross filesystem boundaries and link to files or directories on different filesystems.
+Use Case: Ideal for creating shortcuts or aliasing file or directory paths.
+
+2.How can you check the memory usage of a Linux system?
+
+free -h
+top
+
+3.How do you find the IP address of a Linux system?
+
+ifconfig
+
+
+4.What is the purpose of the "chmod" command in Linux?
+
+The chmod command in Linux is used to change the permissions of files and directories. Permissions determine who can read, write, or execute a file or directory. The chmod command allows users to set or modify these permissions.
+
+File and Directory Permissions
+In Linux, there are three types of permissions:
+
+Read (r): Permission to read the contents of the file or directory.
+Write (w): Permission to modify or delete the file or directory.
+Execute (x): Permission to execute a file (if it is a program or script) or to access a directory.
+These permissions can be set for three categories of users:
+
+User (u): The owner of the file or directory.
+Group (g): The group that owns the file or directory.
+Others (o): All other users.
+
+
+5.What is the purpose of the "grep" command?
+
+
+The grep command in Linux is used to search for patterns within text files. It stands for "Global Regular Expression Print." The primary purpose of grep is to 
+filter and display lines in a file or output stream that match a specified pattern.
+
+
+6.How do you change the password for a user in Linux?
+sudo passwd username
+
+7.What is the purpose of the "crontab" in Linux?
+reffer in shell-script
+
+8.How do you schedule a cron job in Linux?
+Open the Crontab:crontab -e
+Add a Cron Job:* * * * * command_to_run
+Each asterisk represents a time field:
+
+Minute (0-59)
+Hour (0-23)
+Day of Month (1-31)
+Month (1-12)
+Day of Week (0-7, Sunday is 0 or 7)
+
+Example: To run a script every day at 2:30 AM:
+30 2 * * * /path/to/script.sh
+
+Save and Exit:
+View Scheduled Cron Jobs:crontab -l
+
+
+9.Disk space full issue?
+Check Disk Usage: df -h
+Find Large Files: du -h --max-depth=1 /
+Clear Logs: sudo truncate -s 0 /var/log/*.log
+Remove Temp Files: rm -rf /tmp/*
+Clean Package Cache: sudo apt-get clean
+Prune Docker: docker system prune -a
+Remove Old Kernels: sudo apt-get autoremove --purge
+
+10.Running out of memory?
+Check Memory Usage: free -h
+Identify Memory-Intensive Processes: top or htop
+Kill Unnecessary Processes: sudo kill -9 <PID>
+Clear Cache: sudo sync; sudo sysctl -w vm.drop_caches=3
+Add Swap Space:
+restart if necessary: restart boot
+
+11.How do you troubleshoot high CPU usage on a Linux server?
+Check CPU Usage: top or htop
+Identify High-CPU Processes: ps -eo pid,cmd,%cpu --sort=-%cpu | head
+Check Load Average: uptime
+Monitor Specific Process: strace -p <PID>
+Limit CPU Usage: sudo cpulimit -p <PID> -l 50
+Check I/O Wait: iostat -c
+Restart Problematic Service: sudo systemctl restart <service_name>
+
+12.Describe the boot process of a Linux system?
+
+BIOS/UEFI: Initializes hardware, loads bootloader.
+Bootloader (GRUB): Loads kernel into memory.
+Kernel: Initializes hardware, mounts root filesystem, starts init/systemd.
+init/systemd: Starts services based on runlevel/target.
+Login Prompt: System is ready for user login.
+
+13.You need to transfer a large file securely between two Linux servers. What tools or protocols would you use, and why
+SCP (Secure Copy Protocol):Why: Simple, secure, and widely available. Encrypts data during transfer.
+command: scp largefile user@remote:/path/to/destination
+rsync:Why: Efficient for large files. Supports resume of interrupted transfers and incremental copying. Can use SSH for secure transfer.
+command: rsync -avz -e ssh largefile user@remote:/path/to/destination
+SFTP (SSH File Transfer Protocol):Secure, reliable, and allows for resuming interrupted transfers. Uses SSH for encryption.
+command:sftp user@remote
+put largefile /path/to/destination
+
+
+14.A user accidentally deleted an important file, and you need to recover it from the backup. Explain the steps you would take to restore the file.
+Identify the Backup Location:
+Verify Backup Integrity
+Locate the File:
+Restore the File: From a Local Backup, Using Backup Software (e.g., rsync, tar, or specific backup utilities), From Cloud Storage (e.g., using aws s3 cp for S3)
+Verify Restoration:
+Inform the User:
+
+15.A user reports that they are unable to connect to a remote Linux server using SSH. How would you troubleshoot and resolve this connectivity issue?
+Check Network Connectivity: ping <server_ip_or_hostname>
+Verify SSH Service Status: sudo systemctl status sshd
+Confirm SSH Port Availability: sudo netstat -tuln | grep :22
+Verify User Credentials and Permissions: username and password
+Check for IP or Hostname Issues:
+Look at Server Logs:
+
+16.You need to find all files larger than 100MB in the /home directory and its subdirectories. How would you accomplish this task?
+find /home -type f -size +100M
+/home: The directory to search in.
+-type f: Search for files (not directories).
+-size +100M: Find files larger than 100MB.
+
+17.What is inode?
+An inode (index node) is a data structure in a Unix-like file system that stores metadata about a file or directory, excluding its name or actual data content.
+
+File Type: Regular file, directory, symbolic link, etc.
+Permissions: Read, write, and execute permissions.
+Owner and Group: User ID (UID) and Group ID (GID) of the file.
+File Size: The size of the file in bytes.
+Timestamps: Access, modification, and change times.
+Link Count: Number of hard links pointing to the inode.
+Pointers to Data Blocks: Addresses of the disk blocks where the file’s data is actually stored.
+
+18.
+
+19.How do you clear the server if you continuously get Space not available?
+Delete Unnecessary Files:
+ Temporary Files: sudo rm -rf /tmp/*
+ Old Logs: sudo truncate -s 0 /var/log/*.log
+ Large Files: find / -type f -size +100M -exec ls -lh {} \;
+ rm <large_file>
+
+Remove Unused Packages:
+ Clean Package Cache: sudo apt-get clean
+ Remove Unused Packages: sudo apt-get autoremove
+ 
+Check Disk Usage Per Directory:
+ sudo du -h --max-depth=1 /
+
+Clear Docker Resources:
+ docker system prune -a
+
+Delete Old Backups: 
+
+Resize or Add Storage:
+Delete Old Backups:
+
+
+20.What are the Linux commands you use daily?
+Here are common daily Linux commands:
+
+ls: List directory contents.
+cd: Change directory.
+cp: Copy files.
+mv: Move/rename files.
+rm: Delete files.
+mkdir: Create a directory.
+cat: View file content.
+grep: Search within files.
+top: Monitor system processes.
+df: Check disk space.
+ssh: Securely connect to a remote server.
+chmod: Change file permissions.
+sudo: Execute commands as superuser.
+
+
+21.Linux file permissions types?
+Linux file permissions:
+Read (r): View file contents or list directory contents.
+Write (w): Modify or delete file; create/delete files in directory.
+Execute (x): Run file as a program; access directory.
+
+Permissions are assigned to three categories:
+Owner (user): The file's creator or owner.
+Group: Users who are members of the file's group.
+Others: All other users.
+
+user --> full access
+group --> RW
+Others -- X
+
+chmod 761 <filename>:this means all access to user(4+2+1),read,write access to group
+(4+2),excute access to other(1)
+
+755
+user --> full
+group --> rx
+
+ useradd <username>:to create user,if we create username group name also created
+ with the same name by default
+ created user:id <username>
+ cat /etc/passwd: to get the user-lists in server
+ getent group: will have group information
+ passwd <username>: to give user password
+ 
+groupadd devops(i.e,, groupname):used to create group
+getent group:lists groups in server
+ 
+usermod -g devps(group) ramesh(username):used to add user into group as primary
+id uername : to check group name
+
+linux user should have only one primary group, can have multiple secondary group
+for example there will be a group called testing..
+groupadd testing
+usermod -aG testing(group) ramesh(username) here a is append G is secondary group:
+to add user into secondary group,to check id <username>
+ 
+gpasswd -d ramesh(user) testing(group):to delete user into testing team or group
+we can not remove user from primary group..we can only change/modify
+usermod -g ramesh ramesh:to change primary group name
+
+1.useradd raheem-to add user
+2.id raheem
+3.usermod -g devops raheem-->to add user into group
+4.usermod -aG testing raheem-->to add user into secondary group
+delete:
+gpasswd -d raheem testing:to remove from secondary group
+usermod -g raheem raheem:changed groupname to username to delete the user
+userdel raheem:to del the user
+
+
+wget is used to download files and folder or softwares into linux server
+curl is used to get the text directly on to the terminal
+
+cut command is used to get the fragments of a text using delimiter
+cut -d "/" -f1
+
+| this is called piping in linux
+echo https://raw.githubusercontent.com/daws-78s/notes/main/session-02.txt | cut -d "/" -f1
+we get https: we can change f2,f3 like that
+
+COMMANDS IN LINUX LEARNED SO FAR:(summary)
+ ----------------------------------------
+$ --> normal user
+# --> root access
+/ root directory
+/home/ec2-user
+ls --> list subdirectories
+cd --> change directory
+ls -l --> long format
+ls -lr --> reverse alphabetical order
+ls -lt --> latest files
+ls -ltr --> starts from old files
+ls -la --> all files and directory including hidden
+touch <file-name> --> this will create a empty file
+update --> enter info into file
+cat > sample-->it will replace the text
+cat >> sample-->it will create new text
+enter the text you want
+once over click enter and ctrl+d
+
+> --> replace old content
+>> --> append/add to the old content
+
+rm  <file-name>
+rm -r --> recursive
+rmdir --> deletes only empty directory, fails when it has files inside
+
+mkdir --> make directory
+rm -r directory_name --> If the directory is not empty
+cp <source-file> <destination-path>:copy
+mv <source-file> <destination-path>:move or cut
+grep
+-----------
+used to search for a word in file --> used to search text in file
+
+grep <word-to-find> <which-file>
+
+wget :is used to download files and folder or softwares into linux server
+
+curl :is used to get the text directly on to the terminal
+
+echo :Printing text to the terminal
+cut -d "/" -f1:command is used to get the fragments of a text using delimiter
+awk -F "/" '{print $1F}':awk command is used text processing..generally used to divide the text in column format
+
+head and tail
+--------------
+head --> gives first 10lines of the file
+tail --> last 10 lines of the file
+
+Editor
+------------
+vi and vim
+
+vim advanced version of vi
+
+vim <file-name>
+Colon/Command mode
+---------------
+:q --> Quit, to come out of the file
+:q! --> force quit, dont save the changes, quit the file
+:wq --> write and quit
+:set nu
+:/<word-to-find> --> search the word from top
+:?<word-to-find> --> search the word from bottom
+:noh --> remove focus i.e nohighlight
+:%d --> delete everything if we want to delete particular line we can give %1d,%2d 
+like that
+
+:s/bin/BIN --> replace in the line where your cursor is
+:%s/bin/BIN --> replace in every line, but only first occurence
+:<line-no>s/<word-to-find>/<replace-word>/g --> first occurence in that line, if you want global(all occurences in that line) just give g
+:%s/<word-to-find>/<replace-word>/gi --> all occurences in the file
+
+Esc Mode
+----------
+shift+g --> go to bottom
+gg --> go to top
+u --> undo
+yy --> copy
+p --> paste
+10p --> 10 times copy
+chmod o+x <file-name>
+
+sudo su -: to get the root access(#)
+useradd <username>:to create user,if we create username group name also created
+with the same name by default
+id <username>:read user
+cat /etc/passwd: to get the user-lists in server
+getent group: will have group information
+ 
+passwd <username>: to give user password
+ 
+vim /etc/ssh/sshd_config: give authentication to user
+sshd -t: to check whether we give proper authentication to user or not
+systemctl restart sshd:we have to restart the server
+groupadd devops(i.e,, groupname):used to create group
+usermod -g devops raheem-->to add user into group
+usermod -aG testing raheem-->to add user into secondary group
+delete:
+gpasswd -d raheem testing:to remove from secondary group
+usermod -g raheem raheem:changed groupname to username to delete the user
+userdel raheem:to del the user
+
+chown <user>:<group>-->change ownership
+cat /etc/shadow:linux stores the password
+
+vim /etc/sudoers-->give sudo access to users in key-based authentication
+useadd -g wheel robert-->we can give access to all group not
+using sudoers..adding user to wheel group is easy and safe
+
+/etc/yum.repos.d-->location of package URL'S
+yum install git -y -->automatically install package without asking yes/no
+yum remove git -y  -->to remove package
+yum list installed-->
+yum list all --> all the package for the linux server
+yum list all | wc -l -->word count of the list
+yum list installed | wc -l -->installed packages
+yum list available | wc -l -->all-installed packages
+yum search mysql -->to search packages related to mysql
+
+cat /etc/*release-->This command is used to display information about the operating system release installed on your system.
+cat /etc/proc/cpuinfo-->This command displays information about the CPU(s) installed on your system.
+cat /etc/proc/meminfo-->This command displays information about the system's memory (RAM).
+cat /etc/os-release--->This command displays information about the operating system distribution and version
+
+Service management commands:
+---------------------------
+systemctl start nginx
+systemctl status nginx
+systemctl stop nginx
+systemctl restart nginx
+systemctl enable nginx
+systemctl disable nginx
+
+Process Management:
+View Running Processes:
+ps aux
+top
+htop
+
+Kill a Process:
+kill <PID>
+kill -9 <PID>   # Force kill
+
+Network Management:
+Check IP Address:
+ip addr show
+
+Check Network Configuration:
+ifconfig          # Older systems
+ip a              # Newer systems
+
+

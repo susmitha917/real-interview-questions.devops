@@ -1,0 +1,876 @@
+1.If I want to run a specific container in a pod in Kubernetes, how do I run it?
+
+Create a YAML Manifest for the Pod: Define a YAML file for the pod that specifies the container you want to run. 
+Here’s an example of a simple pod manifest:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+  - name: my-container
+    image: my-image:latest
+    ports:
+    - containerPort: 80
+
+
+2.ENTRYPOINT vs CMD.
+
+CMD
+Purpose: Specifies the default command to run when the container starts.
+Override: It can be overridden by passing a command to docker run.
+Syntax:
+Shell form: CMD command param1 param2
+Exec form: CMD ["executable", "param1", "param2"]
+
+ENTRYPOINT
+Purpose: Configures a container that will run as an executable.
+Override: The command passed to docker run will be used as arguments to the ENTRYPOINT.
+Syntax:
+Shell form: ENTRYPOINT command param1 param2
+Exec form: ENTRYPOINT ["executable", "param1", "param2"]
+
+Key Differences
+CMD provides default commands or arguments for the container.
+ENTRYPOINT sets the main command to run and is less likely to be overridden. Instead, arguments are passed to it.
+When both are used together, CMD provides default arguments to the ENTRYPOINT.
+
+# Dockerfile with both ENTRYPOINT and CMD
+FROM ubuntu
+ENTRYPOINT ["echo"]
+CMD ["Hello, World!"]
+
+
+
+3.How are the pods communicating with each other?
+
+1.Cluster IP (Pod-to-Pod Communication)
+IP Addresses: Each pod in a Kubernetes cluster is assigned a unique IP address, which allows them to communicate with each other directly using these 
+IP addresses.
+DNS: Kubernetes provides DNS resolution for services and pods, enabling pods to find each other by name. The internal DNS server automatically creates DNS 
+entries for services.
+
+2. Services
+Service Abstraction: Kubernetes services provide a stable endpoint (a fixed IP and DNS name) for a set of pods. This abstracts the details of pod IP addresses and allows for load balancing and service discovery.
+Types of Services:
+ClusterIP: Exposes the service on a cluster-internal IP. This is the default type and allows communication between pods within the cluster.
+NodePort: Exposes the service on each node’s IP at a static port.
+LoadBalancer: Exposes the service externally using a cloud provider’s load balancer.
+Headless Service: Doesn’t allocate a ClusterIP. Used for stateful applications that require direct access to individual pod IPs.
+
+Pods in Kubernetes can communicate through direct IP addresses, services, network policies, ingress, and shared configurations or volumes. 
+Each method serves different use cases, from internal pod-to-pod communication to exposing services externally and sharing configuration data.
+
+
+
+
+4.What will you do to make your application more secure?
+
+To secure your Kubernetes application, follow these steps:
+
+Container Image Security
+
+Use trusted base images.
+Regularly update images.
+Scan images for vulnerabilities.
+Kubernetes Resource Management
+
+Use namespace isolation.
+Implement network policies.
+Access Control
+
+Implement RBAC.
+Apply least privilege principle.
+Pod Security
+
+Enforce pod security policies.
+Secrets Management
+
+Use Kubernetes Secrets.
+Enable encryption at rest for etcd.
+Network Security
+
+Use TLS/SSL for communication.
+Secure ingress traffic.
+Monitoring and Logging
+
+Implement centralized logging.
+Enable and review audit logs.
+Set up monitoring and alerts.
+Supply Chain Security
+
+Sign and verify container images.
+Secure your CI/CD pipeline.
+Backup and Disaster Recovery
+
+Perform regular backups.
+Have and test a disaster recovery plan.
+Security Best Practices and Policies
+
+Establish security policies.
+Regularly train your team on security best practices.
+
+
+
+
+
+5.what is namespace in kubernetes?
+Namespace is logically isolated in kubernetes.usually we will create one namespace for one project.
+so the resources will be isolated to the namespace level.
+
+
+
+6.What is a pod security policy?
+
+A Pod Security Policy (PSP) is a Kubernetes resource that defines a set of security-related conditions that a pod must meet to be allowed to run in the cluster. It is used to enforce security standards and best practices at the pod level.
+
+Key features of Pod Security Policies include:
+
+Control Over Privileged Containers: They can restrict or allow the use of privileged containers and control privilege escalation within containers.
+Filesystem Controls: PSPs can enforce read-only root file systems and control the usage of various volume types, like hostPath.
+User and Group Controls: They specify user and group IDs that containers must run as and can restrict root user access.
+Capability Controls: They allow dropping or adding specific Linux capabilities to containers.
+Networking Controls: PSPs can restrict the use of host network, host ports, and host IPC.
+Sysctl Controls: They specify safe sysctl parameters that can be used in containers.
+
+
+7.How will you implement security for a running container if you find a vulnerability?
+Isolate the Container: Restrict its network access or stop it to prevent further exploitation.
+Scan and Identify: Use security tools to scan the container and identify the specific vulnerability.
+Patch and Update: Update the base image or software dependencies to fix the vulnerability, then rebuild and redeploy the container.
+Monitor and Audit: Continuously scan for vulnerabilities and review logs for suspicious activity.
+
+
+8.What are the various things that can be done to increase Kubernetes security?(4th ans)
+
+Role-Based Access Control (RBAC): Control access to Kubernetes resources based on roles,create namespace
+Network Policies: Define and enforce network traffic rules between pods.
+Pod Security Policies (PSP): Set security standards for pods regarding privileges and access.
+Secure Images: Use trusted sources, scan for vulnerabilities, and minimize image size.
+TLS Encryption: Encrypt communication between Kubernetes components and services.
+Monitoring and Logging: Centralize logs and set up monitoring for early threat detection.
+Regular Updates: Patch nodes, containers, and Kubernetes components regularly.
+Backup and Recovery: Implement backups and test disaster recovery plans.
+Security Awareness: Educate teams on security best practices and policies.
+Continuous Improvement: Review and improve security measures regularly.
+
+
+
+9.What problems have you faced?
+
+
+
+
+
+
+10.How often do you release the product?
+
+
+
+
+
+11.What Kubernetes issues have you encountered in production?
+Networking Problems: Pods fail to communicate or services become inaccessible
+Storage Issues: Data loss or unavailability due to misconfigured persistent volumes
+Pod Scheduling Failures: Pods stay in Pending due to insufficient resources
+Service Discovery Issues: Traffic routing problems or unbalanced loads. 
+Upgrade Challenges: Downtime during cluster upgrades
+
+
+
+
+12.What is the architecture of Kubernetes?
+
+The architecture of Kubernetes follows a master-slave model and consists of several key components that work together to manage containerized applications across a cluster of nodes. Here’s a concise overview of Kubernetes architecture:
+
+Components of Kubernetes Architecture:
+Master Node:
+API Server: it is the main component responding to all user requests. It runs on https port 443
+Scheduler: Assigns pods to nodes based on resource availability and constraints. it checks multiple things while scheduling. taints and tolerations, 
+node selectors, affinity, underlying server memory, their cpu consumption etc.
+Controller Manager: Monitors the cluster state and performs cluster management tasks like node management, pod replication, etc.
+etcd: entire k8 cluster data is in etcd. it is very important to take frequent backup. if cloud, they are responsible for this
+
+Node (Minion):
+Kubelet: Agent that runs on each node and ensures containers are running in a pod.
+Kube Proxy: Manages network connectivity and routing for services running inside the pod.
+Container Runtime: Software responsible for running containers, such as Docker, containerd, or CRI-O.
+
+Pods:
+Smallest and simplest Kubernetes object.
+One or more containers that share storage, network, and a specification (like IP address).
+Pods are scheduled onto nodes and managed by the control plane.
+
+How It Works:(workflow)
+Deployment: A user describes the desired state for applications using YAML or JSON manifests.
+API Server: Receives these declarations and communicates with etcd to read the current state of the cluster.
+Scheduler: Assigns pods to nodes based on available resources and other constraints.
+Kubelet: Ensures that the containers described in the pod manifests are running and healthy.
+
+
+Add-ons
+-----------
+kube-dns --> provides DNS to the pods. http://backend:8080. kubedns provides IP address to the service when one pod wants to connect with other pod.
+networking plugins --> VPC CNI, default network inside EKS.
+
+
+aws eks update-kubeconfig --region us-east-1 --name expense-dev
+
+Key Concepts:
+Labels and Selectors: Used to organize and select groups of objects.
+Services: Defines a set of pods and provides a stable endpoint for accessing them.
+Volumes: Provides storage to containers within pods.
+
+Benefits:
+Scalability: Easily scale horizontally by adding or removing nodes.
+High Availability: Self-healing capabilities ensure applications stay running.
+Portability: Works across various cloud providers and on-premises environments.
+Automation: Manages deployment, scaling, and operations of application containers.
+Kubernetes architecture is designed to provide a robust and scalable platform for managing containerized applications, leveraging a distributed system approach 
+to ensure resilience and flexibility.
+
+
+13.How is the pod health check done in Kubernetes?
+
+In Kubernetes, pod health checks are managed through two types of probes:
+
+1.Liveness Probe: Checks if the container in a pod is alive and healthy. If the probe fails, Kubernetes restarts the container.
+
+HTTP Probe: Sends an HTTP GET request to a specified path and port.
+TCP Probe: Checks if a TCP socket is open.
+Exec Probe: Executes a command inside the container and checks the exit status.
+
+2.Readiness Probe: Determines if the container is ready to serve traffic. If the probe fails, Kubernetes removes the pod from load balancers.
+
+HTTP Probe: Similar to liveness probe, checks a specific path and port.
+TCP Probe: Checks if a TCP socket is open and accepting connections.
+Exec Probe: Executes a command and checks the exit status.
+These probes help Kubernetes manage pod lifecycle and ensure only healthy pods receive traffic, enhancing application reliability and availability.
+
+
+14.How do you use Helm charts?
+
+"Helm charts are packages of pre-configured Kubernetes resources that make it easier to deploy, manage, and upgrade applications on Kubernetes. 
+Here’s a concise guide on using Helm charts:
+
+CHART:
+chart describe a related set of Kubernetes resources required to deploy an application or service.
+Chart.yaml: This file contains metadata about the chart, such as its name, version, and description.
+values.yaml: Defines default values for the chart's configurable parameters.which can be overridden during deployment to customize the application's behavior.
+
+A Helm chart is a collection of files that describe a set of Kubernetes resources. The key files in a chart include:
+Chart.yaml: Contains metadata about the chart, like its name and version.
+values.yaml: Provides default values for the chart's configurable parameters, which can be overridden during deployment.
+templates/: Contains the Kubernetes manifest templates that Helm uses to generate the final resources based on the provided values."
+
+BENEFITS:
+Consistency, Reusability, Version Control
+
+
+15.What is the Blue/Green Deployment Pattern?
+The Blue/Green Deployment pattern is a release strategy where two identical environments (Blue and Green) are used to deploy and test new application versions.
+
+Key Steps:
+Deploy to Green: Deploy the new version to the Green environment while Blue remains live.
+Test Green: Validate the new version in the Green environment.
+Switch Traffic: Shift user traffic from Blue to Green once testing is successful.
+Rollback (if needed): If issues arise, switch traffic back to Blue.
+
+Benefits:
+Zero Downtime, Simple Rollback, Safe Testing
+
+
+16.Can you explain the concept of auto-healing in Kubernetes and give examples of how it works?
+
+Auto-healing in Kubernetes refers to the system's ability to automatically detect and recover from failures of applications, nodes, or other components without 
+human intervention. This feature is crucial for maintaining high availability and reliability of applications running in a Kubernetes cluster.
+
+Auto-healing in Kubernetes involves various mechanisms to ensure that the desired state of the cluster is maintained. These mechanisms include pod auto-healing,
+node auto-healing, health checks, and the use of Operators for more complex recovery scenarios. This results in a resilient and self-managing system capable of 
+recovering from failures without manual intervention.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: liveness-readiness-pod
+spec:
+  containers:
+  - name: liveness-readiness-container
+    image: nginx
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+      initialDelaySeconds: 3
+      periodSeconds: 3
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+      initialDelaySeconds: 3
+      periodSeconds: 3
+	  
+	  
+
+17.What is a label and selector in Kubernetes?
+In Kubernetes, labels and selectors are key concepts used for identifying and grouping objects within the cluster. They are fundamental to how Kubernetes 
+manages and interacts with resources.
+
+Labels
+Definition:
+
+Label: A label is a key-value pair attached to Kubernetes objects (such as pods, services, deployments) that provides metadata about the object.
+
+metadata:
+  labels:
+    app: frontend
+    environment: production
+	
+
+
+Selectors
+Definition:
+
+Selector: A selector is a way to query or select objects based on their labels.
+Purpose:
+Identification: Selectors are used by controllers (like Deployments, ReplicaSets) and services to find and manage related objects based on their labels.
+
+selector:
+  matchLabels:
+    app: frontend
+    environment: production
+
+In Kubernetes, labels and selectors provide a powerful way to organize, select, and manage resources within the cluster. Labels offer flexible metadata, while 
+selectors enable efficient querying and management of related objects. This system helps Kubernetes operators and controllers effectively orchestrate 
+applications and services, promoting scalability, manageability, and flexibility within the cluster.
+
+
+18.What is the CrashLoopBackOff state in a pod?
+The CrashLoopBackOff state in a Kubernetes pod indicates that a container in the pod is repeatedly crashing and Kubernetes is trying to restart it. 
+This state typically occurs when the container fails to start or crashes shortly after starting, and Kubernetes is attempting to restart it but the failure 
+continues.
+
+Common Causes:Configuration Issues, Application Errors, Resource Constraints, Dependency Failures
+How to Troubleshoot:Check Logs, Inspect Events,Resource Limits,Dependency Check
+
+
+19.What is Kubernetes Ingress?
+Kubernetes Ingress is an API object that manages external access to services in a Kubernetes cluster, typically HTTP and HTTPS traffic. It provides rules and 
+configurations for routing traffic from external sources to services within the cluster, offering features such as load balancing, SSL termination, and 
+name-based virtual hosting.
+
+Key Features and Components of Kubernetes Ingress:
+Routing Rules:
+Ingress allows you to define rules that specify how incoming requests should be forwarded to services based on criteria like host names, paths, and protocols.
+
+Load Balancing:
+Ingress controllers manage load balancing across multiple backend services based on defined rules, distributing traffic efficiently.
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: example-ingress
+spec:
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /app1
+        pathType: Prefix
+        backend:
+          service:
+            name: app1-service
+            port:
+              number: 80
+      - path: /app2
+        pathType: Prefix
+        backend:
+          service:
+            name: app2-service
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - example.com
+    secretName: example-tls-secret
+
+
+20.What are Kubernetes ConfigMaps and Secrets?
+In Kubernetes, ConfigMaps and Secrets are both mechanisms for managing configuration data and sensitive information, respectively, used by applications running 
+in a cluster. They provide a way to decouple configuration details and secrets from application code, allowing for easier management, updating, and sharing of 
+configuration across deployments.
+
+Kubernetes ConfigMaps:
+Definition:
+
+ConfigMap: A ConfigMap is an API object in Kubernetes that allows you to store non-sensitive configuration data in key-value pairs.
+Purpose:
+
+Configuration Data: ConfigMaps are used to store configuration settings, environment variables, command-line arguments, or any other configuration data that 
+an application might need.
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-config
+data:
+  DATABASE_URL: "mongodb://mongo.example.com:27017"
+  API_KEY: "my-api-key"
+
+
+Kubernetes Secrets:
+Definition:requires encryption
+Secret: A Secret is an API object that securely stores sensitive data, such as passwords, OAuth tokens, and SSH keys, in a Kubernetes cluster.
+Purpose:
+Sensitive Information: Secrets are designed to store sensitive data that should not be exposed or stored in plain text within pods or container images.
+Security: They ensure that sensitive information is stored securely and can be accessed only by authorized applications or users.
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: example-secret
+type: Opaque
+data:
+  username: YWRtaW4=  # base64-encoded value
+  password: MWYyZDFlMmU2N2Rm  # base64-encoded value
+
+Handling of Data:
+
+ConfigMaps: Data is stored in plain text and can be accessed as environment variables or mounted as files in containers.
+Secrets: Data is stored in base64-encoded format and is automatically decrypted by Kubernetes when accessed by pods.
+
+
+21.How do microservices work?
+
+
+
+
+
+22.How do you debug your existing container?
+1.View Logs: Check container logs for errors or issues:
+kubectl logs <pod-name> [-c <container-name>]
+
+2.Interactive Shell: Access an interactive shell session inside the container:
+kubectl exec -it <pod-name> [-c <container-name>] -- /bin/sh
+
+3.Inspect Resources: Describe pod details and check statuses:
+kubectl describe pod <pod-name>
+
+4.Network Debugging: Use port forwarding and network tools for connectivity checks:
+kubectl port-forward <pod-name> <local-port>:<container-port>
+
+5.Check Environment Variables: Verify environment variables and configurations:
+kubectl exec -it <pod-name> env
+
+6.Resource Monitoring: Monitor container resource usage:
+kubectl top pod <pod-name>
+
+
+
+23.What is a DaemonSet?
+A DaemonSet in Kubernetes ensures that a copy of a specific pod runs on all (or a subset of) nodes in the cluster. It is useful for deploying system-level 
+services or monitoring agents that need to be present on every node
+
+Pod Distribution: Ensures that exactly one instance of a pod runs on each node in the cluster where the DaemonSet is scheduled.
+Automatic Addition/Removal: Automatically adds pods to newly joined nodes and removes them from nodes that are removed from the cluster.
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd
+  labels:
+    app: fluentd
+spec:
+  selector:
+    matchLabels:
+      app: fluentd
+  template:
+    metadata:
+      labels:
+        app: fluentd
+    spec:
+      containers:
+      - name: fluentd
+        image: fluentd:v1.2.3
+        # additional configuration for fluentd container
+		
+		
+
+
+24.How do you upgrade the database and cluster in Kubernetes?
+
+
+
+
+
+25.How do you design your pods to be highly available?
+1.ReplicaSets or Deployments
+Use ReplicaSets or Deployments to manage multiple instances (replicas) of your pods:
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: app-container
+        image: myapp:v1
+
+Replicas: Ensure you have multiple instances of your pod (e.g., 3 replicas as shown) spread across different nodes to handle traffic and provide redundancy.
+
+2.Pod Anti-Affinity
+Use Pod Anti-Affinity to ensure that pods of the same application do not co-locate on the same node:
+spec:
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app
+            operator: In
+            values:
+            - myapp
+        topologyKey: kubernetes.io/hostname
+Anti-Affinity: Prevents all replicas of a pod from being scheduled on nodes with existing pods of the same application, reducing the risk of all replicas 
+being impacted by a single node failure.
+
+3.Node Affinity
+Use Node Affinity to schedule pods onto specific nodes or types of nodes (e.g., nodes with higher resources or reliability):
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-type
+            operator: In
+            values:
+            - high-performance
+Node Selection: Directs Kubernetes to prefer nodes matching specific labels, ensuring your pods are placed on nodes optimized for performance or reliability.
+
+4.Health Probes
+Use Liveness and Readiness Probes to ensure proper pod lifecycle management:
+spec:
+  containers:
+  - name: app-container
+    image: myapp:v1
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+      initialDelaySeconds: 15
+      periodSeconds: 10
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 5
+
+
+
+
+26.What is the Kubernetes version you are using?
+
+
+
+27.What is the difference between StatefulSets and Deployments in Kubernetes?
+StatefulSets and Deployments are both Kubernetes controllers for managing pods, but they serve different purposes and are used in different scenarios.
+
+StatefulSets
+StatefulSets are designed for applications that require stable, unique network identities and stable storage. They are used when the order and uniqueness of 
+pods are important.
+
+Provides persistent storage with PersistentVolumeClaims (PVCs) that are unique to each pod and survive pod rescheduling.
+Ordered Deployment and Scaling: Pods are created, updated, and deleted in a strict order, which is important for applications like databases or 
+distributed systems.
+
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: my-statefulset
+spec:
+  serviceName: "my-service"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-container
+        image: my-image
+        volumeMounts:
+        - name: my-storage
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: my-storage
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
+
+
+Deployments:
+Deployments are used for stateless applications and are designed to handle the lifecycle of pods that do not require stable network identities or persistent storage.
+Key Features:
+Rolling Updates:ensuring zero downtime by gradually replacing old pods with new ones.
+Scaling: Easily scale the number of replicas up or down.
+No Stable Identity: Pods are interchangeable and do not have unique identities.
+
+Example Use Cases:
+Web servers
+Stateless applications
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-container
+        image: my-image
+
+
+
+28.Have you done the backup of etcd?
+Backing up etcd is crucial for ensuring the availability and recovery of Kubernetes cluster data. If you’ve done the backup, it involves 
+saving the etcd database to ensure that you can restore it in case of failure or data loss.
+
+etcdctl snapshot save /var/lib/etcd/backup.db
+etcdctl snapshot restore /var/lib/etcd/backup.db
+
+Automate Backups: Set up a cron job or other automation to regularly back up etcd.
+
+
+WHAT IS HEADLESS SERVICE?
+A headless service in Kubernetes is a special type of service that does not assign a single IP address to route traffic. Instead, it allows direct 
+access to the individual pods behind the service. This is useful when you need to connect to each pod separately, such as in databases or stateful 
+applications where each pod might hold unique data.
+
+SERVICE TYPES:
+To route traffic to Pods in Kubernetes, a Service is used, A Service uses a selector to match these labels
+ClusterIP: Internal-only service within the cluster.
+NodePort: External access using a specific port on each node’s IP.
+LoadBalancer: External access via a cloud provider’s load balancer, providing a public IP.
+
+DIFFERENCE BETWEEN REPLICASET AND DEPLOYMENT:
+-----------------
+ReplicaSet directly manages Pods,does not support declarative updates.
+Deployment manages ReplicaSets, allows for seamless updates and rollbacks.
+
+Deployment vs Statefulset
+---------------------------
+1. stateful applications like DB
+2. PV and PVC are mandatory for statefulset
+3. Orderly provisioning of pods happens.
+4. pods keep their identity like name.
+5. We must create headless service.
+6. every pod should have its own storage. so PV and PVC should be created for every pod.
+
+
+
+KEY POINTS:
+---------------------------------------------------------------------------------------------------
+eksctl --> create and manage EKS cluster
+kubectl --> to manage containers in kubernetes cluster
+
+
+1. image building
+	develop in vscode
+	push to github
+	pull in workstation
+	build images
+	push to docker hub
+	
+2. login to workstation
+	install docker, kubectl and eksctl
+	either aws configure or attach the role
+	eks.yaml
+	now create cluster through eksctl command
+	kubectl get nodes
+3. develop K8 YAML files
+	push to github
+	pull in workstation
+	apply using kubectl command
+	
+Static provisioning is suited for scenarios where storage needs are predictable and predefined.
+Dynamic provisioning is more efficient in environments with dynamic and unpredictable storage demands, allowing for automation and ease of use.
+
+1. PV --> representing physical storage
+2. PVC --> Claiming the storage
+3. SC --> automatic creation of volume and PV based on the claim from PVC
+
+RBAC
+----------
+expense
+Authentication and Authorization
+
+trainee --> only read access
+senior enginner --> deployments
+team leader --> namespace admin
+manager --> cluster admin
+
+key points:
+Role : A Role contains a set of permissions  that specify what actions can be performed on specific resources within a namespace.
+clusterRole : ClusterRoles can also grant access to cluster-scoped resources, such as nodes or PersistentVolumes.
+RoleBinding : A RoleBinding associates a Role with a user, group, or service account within a specific namespace. It grants the permissions defined in the 
+Role to the subjects specified in the RoleBinding.
+ClusterRoleBinding: Similar to a RoleBinding, but it binds a ClusterRole to users, groups, or service accounts across the entire cluster. This is used for 
+granting cluster-wide permissions.
+
+RBAC in Kubernetes is a powerful tool to control and manage access to resources, ensuring that users and service accounts only have the permissions 
+necessary to perform their functions
+
+Horizontal Scaling: Adds more instances to handle load; it's suited for distributed systems like Kubernetes.
+Vertical Scaling: Upgrades the existing instance's resources; used when adding instances is not feasible.
+HPA: A Kubernetes feature that automates horizontal scaling of pods based on metrics like CPU utilization, ensuring optimal resource use and application performance.
+
+Taints:
+ Taints are applied to nodes to indicate that they should not accept any pods unless those pods explicitly tolerate the taint.
+kubectl taint nodes node1 key=value:NoSchedule
+
+Tolerations:
+Definition: Tolerations are applied to pods to allow them to be scheduled on nodes with matching taints.
+
+Node Affinity
+Definition:
+
+Node Affinity: A set of rules used to constrain which nodes a pod can be scheduled on based on node labels.
+Types:
+RequiredDuringSchedulingIgnoredDuringExecution: Nodes must meet the affinity criteria for the pod to be scheduled on them.
+PreferredDuringSchedulingIgnoredDuringExecution: Nodes are preferred but not required to meet the affinity criteria.
+
+Pod Affinity:
+Definition: A set of rules that allow pods to be scheduled on nodes that have other pods with specific labels.
+
+Pod Anti-Affinity:
+Definition: A set of rules that prevent pods from being scheduled on nodes that have other pods with specific labels.
+
+Ingress: A Kubernetes resource that defines how external traffic should be routed to services inside the cluster based on rules.
+Ingress Controller: The component that processes Ingress resources and implements the routing rules using a load balancer or proxy, 
+allowing external access to the services as defined.
+
+Init containers
+--------------
+1. Init containers run before the main containers run. It can be one or many
+2. Init containers should be completed one by one.
+3. If init containers fail main containers will not run.
+
+Ephemeral Volumes:
+Definition: Temporary storage volumes that exist only for the lifecycle of the Pod. They are not persistent and are deleted when the Pod is removed.
+
+emptyDir:
+Definition: A type of ephemeral volume that is created when a Pod is assigned to a node and exists as long as the Pod is running. 
+It is stored on the node’s disk.
+Purpose: Provides temporary storage that is shared between containers in a Pod.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+  - name: main-container
+    image: nginx
+    volumeMounts:
+    - mountPath: /data
+      name: my-emptydir
+  volumes:
+  - name: my-emptydir
+    emptyDir: {}
+
+
+
+Sidecar
+Definition: A secondary container in a Pod that complements or provides additional functionality to the main container. 
+They share the same network namespace and can access the same volumes.
+
+
+hostPath
+Definition: A volume type that mounts a file or directory from the host node’s filesystem into a Pod. It is not suitable for production 
+workloads due to potential security risks and lack of portability.
+Example Use Case: Sharing files between containers on the same node
+
+
+
+DaemonSet
+Definition: A Kubernetes resource that ensures a copy of a Pod runs on all (or some) nodes in the cluster. Useful for deploying cluster-wide 
+services such as monitoring agents or log collectors.
+
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: my-daemonset
+spec:
+  selector:
+    matchLabels:
+      name: my-daemon
+  template:
+    metadata:
+      labels:
+        name: my-daemon
+    spec:
+      containers:
+      - name: my-daemon-container
+        image: my-daemon-image:latest
+
+
+PV: The storage resource itself, set up and ready to be used.
+PVC: The request to use that storage resource.
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: efs-static
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  persistentVolumeReclaimPolicy: Retain
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: "fs-074d5e894d9043d49"
+
+
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: efs-static-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ""
+  volumeName: efs-static
+  resources:
+    requests:
+      storage: 2Gi

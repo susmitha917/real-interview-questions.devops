@@ -1,0 +1,146 @@
+1.What is CRONTAB?
+Crontab (cron table) is a configuration file that specifies scheduled tasks or jobs on Unix-like operating systems. These tasks, often referred to as 
+"cron jobs," are executed automatically at specified intervals. The crontab command is used to manage these cron jobs.
+
+run at specific intervals, such as daily, weekly, or even every minute.The crontab file consists of five fields that define the timing—minute, hour, day 
+of the month, month, and day of the week—followed by the command to execute. 
+
+30 2 * * * /path/to/script.sh
+This cron job runs the script script.sh every day at 2:30 AM.
+
+Key crontab commands:
+crontab -e: Edit the crontab file for the current user.
+crontab -l: List the current user's crontab entries.
+crontab -r: Remove the current user's crontab file.
+
+
+2.How would you know the disk usage using the shell script commands?
+df -h : gives me a human-readable summary, showing how much space is used, available, and the percentage of usage for each mounted partition.
+du -sh : used to check the disk usage of specific directories or files.
+
+#!/bin/bash
+
+# Set threshold percentage
+THRESHOLD=80
+
+# Get the current disk usage percentage for root (/) partition
+USAGE=$(df / | grep / | awk '{ print $5 }' | sed 's/%//g')
+
+# Compare current usage with the threshold
+if [ $USAGE -gt $THRESHOLD ]; then
+    echo "Warning: Disk usage is above $THRESHOLD%. Current usage: $USAGE%"
+else
+    echo "Disk usage is under control. Current usage: $USAGE%"
+fi
+
+
+3.Give the purpose of the shebang line?
+The shebang line, found at the very beginning of a script file, serves an essential purpose in Unix/Linux systems. It indicates the script's interpreter, 
+which is the program that should be used to execute the script's commands. The shebang line starts with #! followed by the path to the interpreter.
+
+#!/bin/bash
+
+In summary, the shebang line makes scripts easier to run and ensures they use the correct interpreter, enhancing script portability and user convenience.
+
+
+4.Tell us about the ‘$#’ use in shell scripting?
+In shell scripting, $# is a special parameter that holds the number of positional parameters (arguments) passed to the script or function.
+
+#!/bin/bash
+
+echo "Number of arguments passed: $#"
+
+#!/bin/bash
+
+if [ $# -ne 2 ]; then
+    echo "Usage: $0 arg1 arg2"
+    exit 1
+fi
+
+echo "Both arguments provided: $1 and $2"
+
+
+5.Write a script to check vowels in a string?
+
+6.Differentiate between @ and #?
+
+"$@": Treats each argument as separate. Preserves spaces within each argument.
+"$*": Concatenates all positional parameters into a single string, with spaces between arguments but not within them.
+
+
+7.How can you determine if a linux server is virtualized or bare-metal?
+In an interview, you might answer the question about determining if a Linux server is virtualized or bare-metal like this:
+
+"To determine if a Linux server is virtualized or bare-metal, I would use the following methods:
+Check /sys/class/dmi/id/product_name: This file often contains information about the hardware vendor or virtualization platform.
+Use systemd-detect-virt: This command provides information about the virtualization technology, if any.
+Inspect dmesg logs: I would look for any messages related to virtualization in the kernel log.
+Check lscpu: This command can show virtualization flags if the server is running in a virtual environment.
+sudo virt-what : Returns virtualization type if virtualized.
+
+
+8.Explain special variables in Shell?
+echo "All variables: $@"
+echo "Number of variables passed: $#"
+echo "Script Name: $0"
+echo "Current working directory: $PWD"
+echo "Home directory of current user: $HOME"
+echo "Which user is running this script: $USER"
+echo "Hostname: $HOSTNAME"
+echo "Process ID of the current shell script: $$"
+sleep 60 &
+echo "Process ID of last background command: $!"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+echo "All variables: $@"
+echo "Number of variables passed: $#"
+echo "Script Name: $0"
+echo "Current working directory: $PWD"
+echo "Home directory of current user: $HOME"
+echo "Which user is rnning this script: $USER"
+echo "Hostname: $HOSTNAME"
+echo "Process ID of current shell script: $$"
+
+$@-->>symbol of all variables
+$#-->number of variables passed
+$0-->script name
+$?-->to check exit status of previous command
+$PWD-->present  working directory
+$HOME-->Home directory of current user
+$USER-->Which user is rnning this script
+Hostname: $HOSTNAME
+Process ID of current shell script: $$
+Process ID of last back ground command: $!
+
+awk is a powerful command-line tool used in Unix/Linux for text processing. It allows you to search, extract, and manipulate text from files or 
+command output based on patterns.
+
+Basic Example:
+If you have a file data.txt:
+Alice 30
+Bob 25
+Charlie 35
+
+You can use awk to print only the first column (names):
+awk '{print $1}' data.txt
+
+Idempotency refers to the property of an operation whereby it can be applied multiple times without changing the result beyond the initial application. 
+In other words, an idempotent operation, when repeated, will produce the same outcome as it did the first time.

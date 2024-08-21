@@ -1,0 +1,899 @@
+What are pipeline stages in your organization?
+Here are the typical stages in a CI/CD pipeline, described concisely:
+
+Source Stage:
+
+Fetch Code: Pull the latest code from the version control system.
+Build Stage:
+Compile and Package: Build the application and package it for deployment.
+
+Test Stage:
+Unit and Integration Tests: Run tests to ensure code quality and functionality.
+
+Security Scan Stage:
+Vulnerability Checks: Scan for security vulnerabilities.
+
+Staging Deployment Stage:
+Deploy to Staging: Deploy the application to a staging environment for testing.
+
+Acceptance Testing Stage:
+End-to-End and User Acceptance Tests: Validate the application in a staging environment.
+
+Approval Stage:
+Manual Approval: Obtain necessary approvals for production deployment.
+
+Production Deployment Stage:
+Deploy to Production: Deploy the application to the production environment.
+
+Monitoring Stage:
+Monitor and Alert: Set up monitoring and alerting for the production environment.
+
+Rollback Stage:
+Revert Changes: Rollback to a previous stable state if deployment issues occur.
+Example Jenkins Pipeline (Declarative Syntax)
+pipeline {
+    agent any
+
+    stages {
+        stage('Source') {
+            steps {
+                git 'https://github.com/your-repo.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'mvn clean install'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('Security Scan') {
+            steps {
+                sh 'snyk test'
+            }
+        }
+        stage('Deploy to Staging') {
+            steps {
+                sh 'kubectl apply -f k8s/staging/'
+            }
+        }
+        stage('Acceptance Testing') {
+            steps {
+                sh './run-acceptance-tests.sh'
+            }
+        }
+        stage('Approval') {
+            input 'Deploy to production?'
+        }
+        stage('Deploy to Production') {
+            steps {
+                sh 'kubectl apply -f k8s/production/'
+            }
+        }
+        stage('Monitoring') {
+            steps {
+                sh './setup-monitoring.sh'
+            }
+        }
+    }
+    post {
+        failure {
+            mail to: 'team@example.com',
+                 subject: 'Pipeline failed',
+                 body: "The pipeline has failed. Please check the logs."
+        }
+}
+    }
+
+
+2.What is the architecture of your application CICD deployment in the current organization?
+CI/CD Deployment Architecture
+Source Control: GitHub/GitLab/Bitbucket
+Triggers pipelines via commits/pull requests.
+
+CI/CD Platform: Jenkins
+Manages pipeline execution with Jenkinsfiles.
+
+Build and Test:
+Build Servers: Compiles code.
+
+Testing: JUnit, Selenium for tests.
+Code Quality: SonarQube for static analysis.
+
+Artifact Management: Nexus/Artifactory
+Stores build artifacts (JARs, Docker images).
+
+Containerization: Docker
+Builds and stores container images.
+
+Deployment:
+Kubernetes: Manages container orchestration.
+Helm: Deploys with Helm charts.
+Terraform: Provisions infrastructure.
+Configuration Management: Ansible/Chef/Puppet
+Manages infrastructure and app configurations.
+
+Monitoring and Logging:
+Prometheus/Grafana: Monitors metrics.
+ELK Stack: Collects and visualizes logs.
+Security:
+Snyk/OWASP ZAP: Security scanning.
+HashiCorp Vault: Manages secrets.
+CI/CD Workflow
+Commit Stage:
+Code pushed to Git triggers Jenkins pipeline.
+Build and Test Stage:
+Jenkins builds code and runs tests.
+SonarQube analyzes code quality.
+
+
+
+Diagram
++-------------------------------------+
+|           Source Control            |
+| (GitHub, GitLab, Bitbucket)         |
++-------------------------------------+
+                |
+                v
++-------------------------------------+
+|         CI/CD Platform              |
+|               (Jenkins)             |
++-------------------------------------+
+                |
+                v
++-------------------+    +----------------------+
+| Build & Test      |--->| Code Quality         |
+| (Compile, Unit    |    | (SonarQube)          |
+| Tests, JUnit,     |    +----------------------+
+| Selenium)         |
++-------------------+
+                |
+                v
++-------------------------------------+
+|        Artifact Management          |
+|        (Nexus, Artifactory)         |
++-------------------------------------+
+                |
+                v
++-------------------------------------+
+|          Dockerization              |
+|     (Build and Push Images)         |
++-------------------------------------+
+                |
+                v
++-------------------------------------+
+|        Staging Deployment           |
+| (Terraform, Kubernetes, Helm)       |
+| - Acceptance Tests                  |
+| - End-to-End Tests                  |
++-------------------------------------+
+                |
+                v
++-------------------------------------+
+|          Approval Stage             |
+|          (Manual Approval)          |
++-------------------------------------+
+                |
+                v
++-------------------------------------+
+|        Production Deployment        |
+| (Terraform, Kubernetes, Helm)       |
++-------------------------------------+
+                |
+                v
++-------------------------------------+
+|   Monitoring and Logging            |
+| (Prometheus, Grafana, ELK Stack)    |
++-------------------------------------+
+                |
+                v
++-------------------------------------+
+|         Security Scanning           |
+| (Snyk, OWASP ZAP, HashiCorp Vault)  |
++-------------------------------------+
+Description
+Source Control: Code repository where changes trigger the CI/CD pipeline.
+CI/CD Platform: Jenkins orchestrates the pipeline, executing various stages.
+Build & Test: Code compilation and unit/integration testing.
+Code Quality: SonarQube for static code analysis.
+Artifact Management: Nexus or Artifactory stores build artifacts.
+Dockerization: Builds and stores Docker images.
+Staging Deployment: Uses Terraform and Helm to deploy to the staging environment, running acceptance and end-to-end tests.
+Approval Stage: Requires manual approval before production deployment.
+Production Deployment: Uses Terraform and Helm to deploy to production.
+Monitoring and Logging: Prometheus, Grafana, and the ELK stack monitor and log the application.
+Security Scanning: Tools like Snyk, OWASP ZAP, and HashiCorp Vault ensure security throughout the process.
+
+
+3.What is the issue have you faced in Jenkins non-prod to prod while building the Jenkins job?
+To address issues when moving Jenkins jobs from non-production to production, follow these steps:
+
+Credentials and Access:
+Ensure all necessary credentials (e.g., nexus-auth) are configured in the production Jenkins.
+Verify access permissions and adjust as needed.
+
+Environment Consistency:
+Match tool versions and dependencies between non-prod and prod environments.
+Align configuration files and environment variables.
+
+Resource Allocation:
+Ensure sufficient resources (CPU, memory) are available in production.
+Check and adjust resource limits or quotas.
+
+Configuration Alignment:
+Sync environment variables, file paths, and external service configurations.
+Ensure consistent settings for external services (databases, APIs).
+
+Security Policies:
+Review and update security policies to allow necessary operations.
+Adjust firewall and network settings as required.
+
+Artifact Management:
+Verify Nexus repository configuration and ensure it’s accessible from production.
+Check for consistent artifact versions and availability.
+
+Pipeline Logic:
+Update hardcoded paths or values in Jenkins pipelines to be environment-agnostic.
+Review and adjust job configurations or pipeline scripts.
+
+Dependency Management:
+Ensure dependencies are available and versions are consistent in production.
+Install any missing dependencies.
+
+Network Configurations:
+Verify network settings, including DNS resolution and proxy settings.
+Ensure network configurations allow necessary connections.
+
+
+4.Pipeline issues in Jenkins?(similar to 3rd one)
+Syntax Errors:
+Solution: Validate your Jenkinsfile syntax using a linter or the Jenkins pipeline syntax tool.
+Credential Issues:
+Solution: Ensure all required credentials are configured and accessible. Update or reconfigure credentials if necessary.
+Environment Differences:
+Solution: Align the non-prod and prod environments in terms of tool versions, dependencies, and configurations.
+Resource Constraints:
+Solution: Allocate sufficient resources (CPU, memory) for the Jenkins agents. Adjust resource limits if needed.
+Dependency Management:
+Solution: Ensure all required dependencies are installed and versions are consistent across environments.
+Network Configurations:
+Solution: Verify network settings, including DNS, firewalls, and proxy settings. Ensure network configurations allow necessary connections.
+Artifact Handling:
+Solution: Check for proper configuration of artifact repositories (e.g., Nexus). Ensure artifacts are available and correctly referenced.
+External Services:
+Solution: Verify configurations for external services (e.g., databases, APIs) are correct and accessible from Jenkins.
+Job Configuration:
+Solution: Review and update job configurations to ensure consistency. Avoid hardcoded paths and use environment variables where possible.
+Logs and Debugging:
+Solution: Check Jenkins logs for error messages and stack traces. Enable verbose logging for more detailed information.
+Scripted vs. Declarative Pipelines:
+Solution: Choose the appropriate type of pipeline for your use case. Declarative pipelines are easier to read and maintain, while scripted pipelines offer more flexibility.
+Version Control Integration:
+Solution: Ensure Jenkins is properly integrated with your version control system. Check for any issues with repository access or branch configurations.
+Pipeline Stages and Steps:
+Solution: Review each stage and step in your pipeline for correctness. Ensure dependencies between stages are correctly defined.
+
+
+5.Production pipeline issues in Jenkins?
+same as 4th answer
+
+6.What are the build issues have you faced in your project?
+refer 4th and 5th answer
+
+7.Deployment strategies
+Deployment strategies are crucial for ensuring that software updates are delivered smoothly and with minimal disruption. Here are several common deployment strategies along with their advantages and disadvantages:
+Recreate Deployment:
+Description: The old version is stopped entirely, and then the new version is started.
+Advantages: Simple and easy to understand.
+Disadvantages: Causes downtime as the old version is stopped before the new version starts.
+
+Rolling Deployment:
+Description: Instances of the old version are gradually replaced with instances of the new version.
+Advantages: Minimal downtime, as part of the application remains available during the deployment.
+Disadvantages: Can be complex to manage, especially if there are database schema changes.
+
+Blue-Green Deployment:
+Description: Two identical environments (blue and green) are maintained. The new version is deployed to the inactive environment, and traffic is then switched to it.
+Advantages: No downtime, easy rollback if something goes wrong.
+Disadvantages: Requires double the resources, as both environments must be maintained.
+
+8.What are various plugins in your Jenkins Pipeline?
+Sure, here are the names of various Jenkins Pipeline plugins:
+
+Source Code Management:
+Git Plugin
+GitHub Plugin
+
+Build Tools:
+Maven Integration Plugin
+Gradle Plugin
+NodeJS Plugin
+
+Continuous Integration and Delivery:
+Pipeline Plugin
+Pipeline: Stage View Plugin
+Blue Ocean Plugin
+
+Testing and Quality:
+JUnit Plugin
+JaCoCo Plugin
+SonarQube Plugin
+
+Deployment:
+Deploy to Container Plugin
+Kubernetes Plugin
+AWS CodeDeploy Plugin
+
+Notifications:
+Email Extension Plugin
+Slack Notification Plugin
+HipChat Plugin
+
+Artifact Management:
+Nexus Artifact Uploader Plugin
+Artifactory Plugin
+
+Docker:
+Docker Plugin
+Docker Pipeline Plugin
+
+Infrastructure as Code:
+Terraform Plugin
+Ansible Plugin
+
+Security and Credentials:
+Credentials Binding Plugin
+Role-based Authorization Strategy Plugin
+
+Build Monitoring and Reporting:
+Build Monitor Plugin
+Build Pipeline Plugin
+
+9.How do you create a multi-branch Jenkins pipeline?
+Step-by-Step Explanation
+Introduction:
+
+"To create a multi-branch pipeline in Jenkins, you need to configure Jenkins to automatically manage and create pipelines for each branch in a repository. Here's how you can do it:"
+Open Jenkins Dashboard:
+
+"First, log in to your Jenkins instance and navigate to the dashboard."
+
+Create a New Item:
+"Click on 'New Item' on the left sidebar, and enter a name for your pipeline."
+
+Select Multi-branch Pipeline:
+"Select 'Multi-branch Pipeline' and click 'OK' to proceed."
+
+Configure Branch Sources:
+"In the configuration screen, go to the 'Branch Sources' section. Click 'Add source' and select the type of repository, such as Git or GitHub."
+"Enter the repository URL and credentials if needed."
+
+Configure Build Strategies:
+"You can configure build strategies, such as building only specific branches or discovering tags, based on your requirements."
+
+Define Pipeline Script Location:
+"Specify the location of your Jenkinsfile in the 'Build Configuration' section. By default, Jenkins looks for a Jenkinsfile at the root of each branch."
+
+Save Configuration:
+"Click 'Save' to apply the configuration. Jenkins will then automatically scan the repository for branches and create jobs for each branch with a Jenkinsfile."
+
+Monitor and Manage:
+"Jenkins will manage branches automatically, creating or deleting jobs as branches are created or deleted in the repository."
+
+
+
+10.How do you upgrade Jenkins?
+Upgrading Jenkins involves three main steps:
+
+Preparation:
+Backup the JENKINS_HOME directory.
+Review the changelog for compatibility issues.
+Notify users about the scheduled upgrade.
+
+Upgrade Process:
+For WAR installations: Download the latest WAR file, stop Jenkins, replace the old WAR file, and restart Jenkins.
+For package-managed installations: Use APT (Debian/Ubuntu) or YUM (Red Hat/CentOS) to upgrade Jenkins.
+1.Download the Latest WAR File:
+2.Stop the Jenkins service to prevent any new builds or changes during the upgrade.
+sudo systemctl stop jenkins
+3.Replace the existing WAR file with the new one. For example, if Jenkins is installed in /usr/share/jenkins:
+sudo cp jenkins.war /usr/share/jenkins/jenkins.war
+4.Start the Jenkins service again
+sudo systemctl start jenkins
+
+Post-Upgrade Steps:
+Verify the new Jenkins version via the web interface:http://your_jenkins_url:8080
+Update plugins to ensure compatibility:Manage Jenkins > Manage Plugins > Updates
+Run test jobs to confirm functionality and monitor logs for issues.
+This ensures a smooth and reliable upgrade with minimal downtime:sudo tail -f /var/log/jenkins/jenkins.log
+
+
+
+
+11.What is a shared library?
+"A shared library in Jenkins is a reusable set of pipeline code and functions stored in a version control repository, typically a Git repository. It allows you to share common scripts and functionalities across multiple Jenkins pipelines, promoting code reuse and consistency.
+
+Key Features:
+Centralized Code Management: Store common pipeline code in a single repository.
+Reusable Functions: Define reusable methods and steps in Groovy scripts.
+Version Control: Manage library versions with tags or branches in Git.
+Global Accessibility: Accessible to all pipelines configured to use the shared library.
+
+Usage:
+Define the shared library in the Jenkinsfile using the @Library annotation.
+Call shared functions or load common scripts within the pipeline stages.
+
+EXAMPLE
+@Library('my-shared-library') _
+pipeline {
+    agent any
+    stages {
+        stage('Example') {
+            steps {
+                script {
+                    mySharedFunction()
+                }
+            }
+        }
+    }
+}
+
+
+
+12.What is Jenkins and security tools
+Jenkins is an open-source automation server used for continuous integration and continuous delivery (CI/CD). It automates the building, testing, and deployment 
+of software projects, making it easier to integrate changes and deliver updates quickly and reliably.
+
+Key Features of Jenkins:
+Pipeline Automation: Automates CI/CD pipelines with scriptable pipelines using Groovy.
+Extensibility: Supports a wide range of plugins to integrate with various tools and services.
+Distributed Builds: Can distribute build/test loads to multiple machines.
+Scalability: Easily scalable to manage multiple projects and teams.
+
+Security Tools in Jenkins:
+To ensure secure CI/CD processes, Jenkins integrates with various security tools and plugins:
+
+Role-based Authorization Strategy Plugin:
+Provides fine-grained access control to Jenkins resources based on user roles.
+
+Matrix Authorization Strategy Plugin:
+Allows for detailed permission assignments to users and groups.
+
+Credentials Binding Plugin:
+Manages and securely stores credentials, making them available to jobs as needed.
+
+OWASP Dependency-Check Plugin:
+Scans project dependencies for known vulnerabilities and generates reports.
+
+SonarQube Plugin:
+Integrates with SonarQube for continuous inspection of code quality and security vulnerabilities.
+
+XSS (Cross-Site Scripting) Protection:
+Built-in protections against XSS attacks within Jenkins.
+
+CSRF (Cross-Site Request Forgery) Protection:
+Helps prevent CSRF attacks by ensuring that requests come from trusted sources.
+
+
+13.What is the Jenkinsfile, and how is it used in Jenkins pipelines?
+A Jenkinsfile is a text file that defines a Jenkins pipeline and is stored in the root directory of a source code repository. It allows you to version 
+control your pipeline as code.
+
+Types of Jenkinsfiles:
+Declarative Pipeline: Structured and easy to read.
+Scripted Pipeline: Flexible, uses Groovy scripting,Allows complex and dynamic pipeline logic.
+
+Key Components:
+Agent: Defines where the pipeline runs
+agent any
+Stages: Groups of steps representing different phases
+Steps: Individual tasks within a stage.
+
+Usage:
+Version Control: Stored in the repository for versioning and collaboration.
+Automation: Jenkins automatically detects and runs the Jenkinsfile.
+Consistency: Ensures repeatable and reliable pipeline execution
+
+
+
+14.How to integrate SonarQube in a declarative pipeline?
+Install Plugins:
+Ensure the 'SonarQube Scanner for Jenkins' plugin is installed.
+
+Configure SonarQube:
+In Jenkins, go to 'Manage Jenkins' > 'Configure System'.
+Add SonarQube servers under the 'SonarQube servers' section.
+
+Configure SonarQube Scanner:
+In Jenkins, go to 'Manage Jenkins' > 'Global Tool Configuration'.
+Add 'SonarQube Scanner' under the 'SonarQube Scanner' section.
+
+Update Jenkinsfile:
+Update your Jenkinsfile to include the SonarQube analysis steps.
+
+pipeline {
+    agent any
+
+    tools {
+        // Install the SonarQube Scanner tool
+        sonarqube 'SonarQube Scanner'
+    }
+
+    environment {
+        // Set SonarQube environment variables
+        SONARQUBE_ENV = 'SonarQube'
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'make build'
+            }
+        }
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    // Run SonarQube Scanner
+                    sh 'sonar-scanner'
+                }
+            }
+        }
+        stage('Quality Gate') {
+            steps {
+                // Wait for SonarQube quality gate result
+                script {
+                    timeout(time: 1, unit: 'HOURS') {
+                        def qg = waitForQualityGate()
+                        if (qg.status != 'OK') {
+                            error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                        }
+                    }
+                }
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'make test'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'make deploy'
+            }
+        }
+    }
+}
+Explanation:
+
+tools: Declares the SonarQube Scanner tool.
+environment: Sets the SonarQube environment variables.
+stage('SonarQube Analysis'): Runs the SonarQube scanner.
+stage('Quality Gate'): Waits for the SonarQube quality gate result and fails the build if the quality gate is not passed.
+
+
+15.How to pass credentials in a pipeline?
+To pass credentials in a Jenkins declarative pipeline, you can use the credentials or withCredentials step. Here’s how you can do it:
+Store Credentials:
+Go to 'Manage Jenkins' > 'Manage Credentials'.
+Add the credentials you need (e.g., username and password, secret text).
+
+
+16.What are the features of Jenkins?
+Jenkins is a powerful CI/CD automation server with many features, including:
+1.Extensible with Plugins: Over 1,500 plugins for integration.
+2.Pipeline as Code: Define pipelines in a Jenkinsfile for version control.
+3.Distributed Builds: Distribute workloads across multiple machines.
+4.User-Friendly Configuration: Web interface for easy job setup.
+5.Declarative and Scripted Pipelines: Flexible pipeline definitions.
+6.Community Support: Large, active community and extensive documentation.
+7.Scalability: Handle large projects and multiple jobs.
+8.Security: Role-based access, credential management, and security tool integration.
+9.Version Control Integration: Supports Git, SVN, Mercurial, etc.
+10.Automated Testing: Integrate with testing frameworks.
+11.Notifications and Reporting: Various notification options and detailed build reports.
+12.Parallel Execution: Run tasks in parallel.
+13.Containerized Builds: Support for Docker and Kubernetes.
+14.Environment Management: Deploy to different environments.
+These features make Jenkins a versatile and comprehensive tool for automating the software development lifecycle."
+
+
+17.What is Groovy in Jenkins?
+Groovy in Jenkins is a scripting language used to define and manage Jenkins pipelines. It provides flexibility and control over build, test, 
+and deployment processes.
+
+Key Points:
+1.Pipeline Scripting: Used for both declarative and scripted pipelines.
+2.DSL: Provides a domain-specific language for human-readable pipeline definitions.
+3.Dynamic Language: Features closures, dynamic typing, and meta-programming.
+4.Extensibility: Allows writing custom scripts and shared libraries.
+
+
+18.Which command is used to start Jenkins?
+sudo systemctl start jenkins
+
+
+19.What are Declarative Pipelines in Jenkins?
+Declarative Pipelines in Jenkins provide a structured way to define CI/CD pipelines using a simpler syntax compared to Scripted Pipelines. 
+They offer built-in error handling and are designed for easier readability and maintenance
+
+Key Points:
+Structured Syntax: Predefined sections like pipeline, agent, stages, and steps.
+Ease of Use: Simplifies pipeline definitions without extensive Groovy scripting.
+Visualization: Clear representation in the Jenkins UI.
+
+EXAMPLE:
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                sh 'echo "Building..."'
+            }
+        }
+        stage('Test') {
+            steps {
+                sh 'echo "Testing..."'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'echo "Deploying..."'
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Pipeline succeeded!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
+
+
+20.How can you set up a Jenkins job?
+To set up a Jenkins job:
+
+Create Job: Click 'New Item', name it, select job type (freestyle, pipeline).
+Configure: Define source code (e.g., Git), triggers (e.g., SCM change), build steps (e.g., compile, test), post-build actions (e.g., archive artifacts).
+Save: Save job settings.
+Run: Optionally, trigger the job to ensure proper execution.
+This process automates the build, test, and deployment phases, streamlining development workflows."
+
+
+21.How to create a backup and copy files in Jenkins?
+Creating a Backup:
+
+Backup Jenkins Home Directory: Copy the Jenkins home directory (/var/lib/jenkins) to a safe location.
+Example with tar: sudo tar czvf jenkins_backup.tar.gz /var/lib/jenkins
+Export Job Configurations: Export job configurations manually or using Jenkins CLI/APIs.
+Example with Jenkins CLI:java -jar jenkins-cli.jar -s http://localhost:8080 get-job my-job > my-job.xml
+Copying Files:
+Using Jenkins Workspace: Archive and copy build artifacts within Jenkins pipelines.
+Example in Jenkins Pipeline:
+pipeline {
+    stages {
+        stage('Build') {
+            steps {
+                sh 'make build'
+            }
+        }
+        stage('Copy Artifacts') {
+            steps {
+                archiveArtifacts artifacts: '**/*.jar', allowEmptyArchive: true
+                sh 'cp -r *.jar /path/to/destination'
+            }
+        }
+    }
+}
+Using Jenkins Plugins: Utilize plugins like Copy Artifact Plugin to copy artifacts between jobs or projects.
+
+
+
+
+
+22.How can you secure Jenkins?
+Securing Jenkins Concisely:
+
+Authentication and Authorization:Use strong authentication methods (e.g., LDAP, OAuth) and role-based access control (RBAC).
+HTTPS:Enable HTTPS with a valid SSL certificate to encrypt Jenkins traffic.
+Updates:Keep Jenkins and plugins updated to patch security vulnerabilities.
+File Permissions:Restrict file permissions on Jenkins home directory and configuration files.
+Job and Build Security:Control access to jobs and artifacts using Jenkins' built-in access controls.
+Logging and Monitoring:Enable logging and monitor for suspicious activities.
+Network Security:Use firewalls and restrict external access to Jenkins ports.
+Backup:Regularly backup Jenkins configuration and critical data.
+
+
+
+
+
+23.What is the use of Backup Plugin in Jenkins? How to use it?
+Using the Backup Plugin in Jenkins Concisely:
+Install Plugin: Install the Backup Plugin from Manage Jenkins > Manage Plugins.
+Configure Backup: Go to Manage Jenkins > Configure System.
+Automation: Schedule regular backups to automate the process.
+Manual Backup: Optionally, trigger manual backups from the Jenkins UI.
+
+
+
+MULTI-BRANCH:cretes a pipeline projects according to detected branch in one SCM repository
+
+if( ! env.BRANCH_NAME.equalsIgnoreCase('main')){
+    pipelineDecission.decidePipeline(configMap)
+}
+else{
+    echo "Proceed with CR or NON-PROD pipeline"
+}
+
+there may be multiple develpoers working on with their own branch .. we need to create there own pipeline for everyone..this way multibranch is used.
+
+we are using the multi-brnaching through feature branch we deploy the application into developement environment. once the developement is success
+our developers will raise PR request then changes will come to the master/main branch from main branch we will go to any environemnt like QA, if it is a
+PRODUCTION there is seperate CR process.
+
+
+you can run separate jobs for CI (Continuous Integration) and CD (Continuous Delivery/Deployment):
+CI Job: Handles building and testing your code to ensure it's working correctly.
+CD Job: Deploys the tested code to environments like staging or production.
+
+CI Job Stages:
+Checkout: Pull the latest code from the repository.
+Build: Compile or package the code.
+Unit Tests: Run automated tests to verify code functionality.
+Static Analysis (Optional): Check code quality and standards.
+Artifact Creation: Package the build output (e.g., JAR, Docker image) for deployment.
+
+CD Job Stages:
+Fetch Artifacts: Retrieve the build artifacts from the CI job.
+Deploy to Staging: Deploy the artifacts to a staging environment.
+Integration Tests: Perform tests in the staging environment.
+Approval (Optional): Manual approval before production deployment.
+Deploy to Production: Deploy the artifacts to the live environment.
+
+KEY POINTS:
+-------------------------------------------------------------------------------------
+Jenkins is a master node.
+install agents and distribute the pipelines to the agents...
+
+when developer pushed code to github, we need to trigger the pipeline
+
+pipeline{
+	agent{
+		label 'java-agent'
+	}
+	options{
+		timeout(time: 30, unit: 'MINUTES')
+	}
+	environment{
+		Greeting = 'Hello World'
+	}
+	parameters{
+	
+	}
+	stages{
+		stage('Build'){
+			steps{
+				sh 'echo this is build'
+			}
+		}
+		stage('Test'){
+			steps{
+				sh 'echo this is build'
+			}
+		}
+	}
+	post{
+		always{
+		
+		}
+		success{
+		
+		}
+		failure{
+		
+		}
+	}
+}
+
+CI --> Continous Integration
+	install dependencies
+	artifact -->
+	Java --> jar file
+	dotNet, Python, NodeJs --> zip
+	upload artifact to some location
+	
+Build File
+----------
+Java --> maven --> pom.xml
+Python --> pip --> requirements.txt
+NodeJs --> npm --> package.json
+DotNet --> Nuget --> project.json
+
+NodeJs build file --> node js code and node modules
+every verion should have a seperate artifact/zip file/build file.
+
+Repository
+------------
+Git --> store the code, not for packages or artifacts
+Nexus --> store the artifacts, not for code
+
+8081 --> nexus
+8080 --> jenkins
+
+SRE
+------------
+Installation
+RBAC
+Upgrade
+No downtime
+monitor
+Backup
+
+CD
+----------
+backend --> CI --> up stream
+CI should pass artifact as input, nothing but version
+backend-deploy --> CD --> down stream
+
+Jenkins have the application version, it should pass version to terraform, terraform should create EC2 instance and pass app version to ansible
+ansible should download that package from nexus, configure the EC2
+
+without CI
+-------------
+there will be one linux server
+
+build and release team
+----------------------
+clone the code
+install node js
+run npm install
+create a zip file
+upload the zip file to nexus through nexus API
+
+1week after, once development completed then they will inform
+
+many issues, inform developers, again they will work....
+
+
+again QA, UAT and
+PROD
+------------
+12hr deployment window
+24hr monitoring
+1week monitoring for other defects
+
+no testing, unit testing
+unit testing is about testing the functions, which are basic blocks of programming. Only developers has to do unit testing...
+
+coding standars --> dev, qa, uat
+Static source code analysis --> scan the code, give some recommendations
+you must apply the recommendations to pass the build
+
+SAST --> security related things, analysis will be given to developers they have to fix
+
+DAST --> dynamic security
+
+Open source libraries scan --> libraries scan.. frequently upgrade the libraries
+docker image scan --> 
+
+now deploy the code to development
+then perform functional testing, developers can take care...
+integration testing --> test the entire functionality. this will be performed by QA
+
+sonar scanner
+sonar cli
+sonar agent
+
+
+SAST: Scans source code for vulnerabilities without executing it. Example tools: SonarQube, Checkmarx.
+DAST: Tests the running application for vulnerabilities by simulating attacks. Example tools: OWASP ZAP, Burp Suite.
+
+In Jenkins:
+SAST: Integrate a SAST tool to scan code after build.
+DAST: Deploy the app, then run a DAST tool to test the deployed app.
+
