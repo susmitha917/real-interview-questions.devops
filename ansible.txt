@@ -1,0 +1,243 @@
+ANSIBLE-INTERVIEW -QUESTIONS
+----------------------------------
+Ansible Basic Interview Questions and Answers
+
+1. What is Ansible?
+Ansible is developed in Python. It is a software tool. It is useful while 
+deploying any application using ssh without any downtime. Using this tool one can 
+manage and configure software applications very easily.
+
+2. Ansible Playbooks vs Roles
+Roles	                                                Playbooks
+Roles are reusable subsets of a play.	            Playbooks contain Plays.
+A set of tasks for accomplishing a certain role.	Mapps among hosts and roles.
+Example: common, webservers.	                   Example: site.yml, fooservers.yml, 
+                                                              webservers.yml.
+															  
+
+3. What are the advantages of using Ansible?
+The main three advantages of using this tool are,i.e. Ansible
+
+Agentless
+Very low overhead
+Good performance.
+
+
+5. How does Ansible Works?
+There are many similar automation tools available like Puppet, Capistrano, Chef, Salt, Space Walk, etc, but Ansible categorizes into two types of servers: controlling machines and nodes.
+
+The controlling machine, where Ansible is installed and Nodes are managed by this controlling machine over SSH. The location of nodes is specified by the controlling machine through its inventory.
+
+The controlling machine (Ansible) deploys modules to nodes using SSH protocol and these modules are stored temporarily on remote nodes and communicate with the Ansible machine through a JSON connection over the standard output.
+
+Ansible is agent-less, which means no need for any agent installation on remote nodes, so it means there are no background daemons or programs executing for Ansible when it’s not managing any nodes.
+
+Ansible can handle 100’s nodes from a single system over an SSH connection and the entire operation can be handled and executed by one single command ‘ansible’. But, in some cases, where you are required to execute multiple commands for a deployment, here we can build playbooks.
+
+Playbooks are a bunch of commands which can perform multiple tasks and each playbook are in YAML file format.
+
+
+6. What’s the Use of Ansible?
+Ansible can be used in IT Infrastructure to manage and deploy software applications to remote nodes. 
+For example, let’s say you need to deploy a single software or multiple software to 100’s of nodes by a single command, here ansible 
+comes into the picture, with the help of Ansible you can deploy as many applications to many nodes with one single command, 
+but you must have a little programming knowledge for understanding the ansible scripts.
+
+We’ve compiled a series on Ansible, title ‘Preparation for the Deployment of your IT 
+Infrastructure with Ansible IT Automation Tool‘, through parts 1-4 and covers the following topics.
+
+9. Can you create reusable content with Ansible?
+Yes, Ansible has the concept of roles that helps to create reusable content. To create a role, you need to follow Ansible's conventions of 
+structuring directories and naming files.
+
+10. Is Ansible a Configuration management tool?
+Configuration management is the practice to handle updates and manage the consistency of a product's performance over a particular period of time. Ansible is an open-source IT Configuration Management tool, which automates a wide variety of challenges in 
+complex multi-tier IT application environments.	
+
+11. What are the differences between the variable name and environment variables?
+Variable Names	                                      Environment Variables
+By adding strings, we can build variable names	By accessing existing variables, we can access environment variables
+Supports adding more strings	               The advanced playbooks section sets the environment variables.
+Use the IPV4 address for variable names. 	   Use {{ansible_env.SOME_VARIABLE}} for remote environment variables	
+
+
+
+18. So how does Ansible work? Please explain in detail.
+Within the market, they are many automation tools like Puppet, Capistrano, Chef, Salt, Space Walk, etc.
+
+When it comes to Ansible, this tool is categorized into two types of servers:
+    1. Controlling machines
+    2. Nodes.
+Ansible is an agentless tool so it doesn’t require any mandatory installations on remote nodes. So there are no background programs that are executed while it is managing any nodes.
+Ansible is able to handle a lot of nodes from a single system over an SSH connection.
+Playbooks are defined as a bunch of commands where that are capable of performing multiple tasks and they are in YAML file format.	
+
+
+19. What does Ansible offer?
+ Ansible offers:
+
+Security and Compliance policy integration
+Automated workflow for Continuous Delivery
+Simplified orchestration
+App deployment
+Configuration management
+Streamlined provisioning.
+
+20. Can we manage Windows Nano Server using Ansible?
+No, it is not possible to manage Windows Nano Server using Ansible as it doesn't have full access to the .Net framework, 
+which is primarily used by internal components and modules.	
+
+22. What is Ansible Tower?
+Ansible is classified as a web-based solution which makes Ansible very easy to use. It is considered to be or acts like a hub for all of your automation tasks. 
+The tower is free for usage till 10 nodes.	
+
+23. What are the features of the Ansible Tower?
+Features of the Ansible Tower are:
+
+Ansible Dashboard
+Real-time job status updates
+Multi-playbook workflows
+Who Ran What Job When
+Scale capacity with tower clusters
+Integrated notifications
+Schedule ansible jobs
+Manage and track inventory
+Remote command execution
+REST API & Tower CLI Tool.
+
+28. How can you use docker modules in Ansible?
+Docker modules require docker-py installed on the host running Ansible. 
+
+$ pip install 'docker-py>=1.7.0'
+The docker_service module also requires docker-compose
+
+$ pip install 'docker-compose>=1.7.0'
+
+
+29. Explain how you will copy files recursively onto a target host?
+The copy file in Ansible has a recursive parameter. If you have to copy files for a large number of files, then the synchronizing module is the best choice for it.
+
+- synchronize:
+    src: /first/absolute/path
+    dest: /second/absolute/path
+    delegate_to: "{{ inventory_hostname }}"
+
+31. How can you access a list of Ansible_Variables?
+By default, Ansible gathers facts under machines under management. Further, these facts are accessed in Playbooks and in templates. One of the best ways to view a list of all the facts that are available in a machine, then need to run the setup module in the ad-hoc way:
+
+Ansible- m setup hostname
+
+
+37. What is idempotency?
+Idempotence is an essential feature of Ansible, which helps you to execute one or more tasks on a server as many times as needed, but 
+without changing the result beyond the initial application.	
+
+38. Can you create encrypted files with Ansible?
+Yes, using the 'ansible-vault create' command, we can create encrypted files
+
+$ ansible-vault create filename.yaml
+
+39. What is the difference between a playbook and a play?
+A playbook is a list of plays. A play is a set of tasks and roles that run on one or more managed hosts. 
+Play includes one or more tasks.
+
+
+41. Explain the Ansible Tag's usage?
+A tag is an attribute that sets the ansible structure(plays, tasks, roles). When there's an extensive playbook needed, it's more useful to run just a part of it 
+as opposed to the entire thing. That's where tags usage is required.
+
+
+42. How can you filter out tasks in tags?
+Use –tags or –skip-tags options on the command line
+Use the TAGS_RUN and TAGS_SKIP options, If you're in Ansible configuration settings.
+
+
+43. What are handlers?
+In Ansible, handlers are just like normal tasks in a playbook but run when tasks include the notify 
+directive and also indicate that it changed something. It runs only once after all the tasks executed in a particular play. 
+It automatically loads through roles/<role_name>/handlers/main.yaml. 
+
+They are used to trigger the status of a service, such as restarting or stopping 
+a service.
+
+47. What is Ansible can do?
+Ansible can do the following for us:
+
+Configuration management
+Application deployment
+Task automation
+IT orchestration.
+
+48. Please define what is Ansible Galaxy.
+Ansible Galaxy refers to the website Galaxy where the users will be able to share all the roles to a CLI 
+( Command Line Interface) where the installation, 
+creation, and management of roles happen.
+
+50. Do you know what language Ansible is written in?
+Ansible is written in Python and PowerShell.
+
+51. Please explain what is Red Hat Ansible.
+Ansible and Ansible Tower by Red Hat, both are an end to end-complete automation platforms which are capable of providing the following features or functionalities:
+
+Provisioning
+Deploying applications
+Orchestrating workflows
+Manage IT systems
+Configuration of IT systems
+Networks
+Applications.
+
+52. Is Ansible is an open-source tool?
+Yes, Ansible is an open-source tool that is powerful automation software tool that one can use.
+
+53. Why you have to learn Ansible?
+Ansible is more a tool for servers but does it have anything for networking? If you closely look into it, there is some support available in the market for networking devices. Using this tool, it will give you an overall view of your environment and also knowledge of how it works when it comes to network automation.
+
+It is one of those tools where it is considered to be good to explore a new tool.
+
+54. What are Ansible server requirements?
+You need to have a virtual machine with Linux installed, 
+which has Python 2.6 version or higher. 
+
+
+56. How can you connect to other devices within Ansible?
+Once, Ansible is installed and the basic setup has been completed, an inventory is created. This would be the base and one can start testing ansible. To connect to a different device then you have to use the “Ping module”.
+ This can be used as a simple connection test.
+ 
+58. How can you find information in Ansible?
+After completing the basic setup, one has to make sure to find out the 
+module called the “setup” module. Using this setup module, you will be able to find out a lot of information.
+ 
+60. What is ask_pass in ansible?
+The ask_pass is controlled in Ansible Playbook.
+This controls whether ansible-playbook prompts a password by default. Usually, 
+the default behavior is no:
+It is always set to ask_pass=True
+
+ 
+61. Explain What is ask_sudo_pass?
+This control is very similar to ask_pass
+
+The ask_sudo_pass controls the Ansible Playbook to prompt a Sudo password. Usually, the default behavior is no: 
+
+ask_sudo_pass= True
+
+62. Explain what is ask_vault_pass?
+Using this control we can determine whether Ansible Playbook should prompt a 
+password for the vault password by default. As usual, the default behavior is no
+
+ask_vault_pass= True
+63. Explain Callback_plugin in Ansible?
+Callbacks are explained as a piece of code in ansible environments where 
+to get is used to call a specific event and permit the notifications.
+This is more sort of a developer-related feature and allows low-level extensions around ansible so that they can be loaded from different locations without any problem.
+ 
+64. Explain Module utilities in Ansible?
+Ansible provides a wide variety of module utilities that help developers while developing their own modules. The basic.py is a module that provides the main entry point for accessing the Ansible 
+library and using those as basics one can start off working
+
+
+66. Explain in detail ad-hoc commands?
+Well, ad-hoc commands are nothing but a command which is used to do something quickly and it is more sort of one-time use. Unlike, the playbook is used for repeated action which is something that is very useful in the Ansible environment. But there might be scenarios where we want to use ad-hoc commands which can simply do the 
+required activity and it is a nonrepetitive activity.
+
