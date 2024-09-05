@@ -43,8 +43,8 @@ among multiple containers.
 Anonymous volumes are not given a specific name. They are useful for scenarios where you need a temporary volume that you don’t need to reference later. 
 These volumes are automatically created and removed when the container is removed.
 
-4.How can we pass an argument to Dockerfile?
 
+4.How can we pass an argument to Dockerfile?
 Passing arguments to a Dockerfile can be done using the ARG instruction to define build-time variables and the --build-arg flag with the docker build 
 command to pass values for those variables.
 
@@ -193,23 +193,18 @@ CMD ["nginx", "-g", "daemon off;"]
 
 Docker Images
 Definition:
-
 A Docker image is a read-only template that contains the application code, libraries, dependencies, tools, and other files needed to run an application.
-Immutability:
 
+Immutability:
 Docker images are immutable, meaning they do not change once they are created. Any changes require creating a new image.
 Layers:
-
 Docker images are composed of layers. Each layer represents a set of file changes or additions. Layers are created by executing Dockerfile instructions 
 (e.g., RUN, COPY, ADD).
 Storage:
-
 Docker images are stored in Docker registries (e.g., Docker Hub, private registries) from where they can be downloaded and shared.
 Usage:
-
 Docker images are used to create Docker containers. They provide the blueprint for what the container should contain and how it should run.
 Build:
-
 Docker images are built using a Dockerfile, which contains a series of instructions to set up the environment and application.
 
 
@@ -220,24 +215,18 @@ A Docker container is a runnable instance of a Docker image. It is a lightweight
 application.
 
 Mutable State:
-
 Unlike images, containers can have a mutable state. They can be started, stopped, moved, and deleted. You can also make changes inside a running container.
 
 Isolation:
-
 Containers provide process and filesystem isolation using Linux kernel features like namespaces and cgroups. Each container runs in its own isolated environment.
 
 Lifecycle:
-
-
 Containers have a lifecycle: they can be created, started, stopped, paused, restarted, and removed.
 
 Storage:
-
 Containers can use volumes or bind mounts to persist data beyond their lifecycle. Without these, changes made to a container are lost when it is removed.
 
 Usage:
-
 Containers are used to run applications based on the blueprint provided by the image. Multiple containers can be run from the same image, each with its own 
 unique state and data.
 
@@ -336,7 +325,8 @@ this instruction will run at the time of container creation.
 
 
 6. COPY
-The COPY instruction copies new files or directories from <src> and adds them to the filesystem of the container at the path <dest>. It only supports local files.
+The COPY instruction copies new files or directories from <src> and adds them to the filesystem of the container at the path <dest>. It only supports local 
+files.
 Ex:COPY . /usr/src/app
 
 7. ENTRYPOINT

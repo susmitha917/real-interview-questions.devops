@@ -819,26 +819,6 @@ Example Use Case: Sharing files between containers on the same node
 
 
 
-DaemonSet
-Definition: A Kubernetes resource that ensures a copy of a Pod runs on all (or some) nodes in the cluster. Useful for deploying cluster-wide 
-services such as monitoring agents or log collectors.
-
-apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: my-daemonset
-spec:
-  selector:
-    matchLabels:
-      name: my-daemon
-  template:
-    metadata:
-      labels:
-        name: my-daemon
-    spec:
-      containers:
-      - name: my-daemon-container
-        image: my-daemon-image:latest
 
 
 PV: The storage resource itself, set up and ready to be used.

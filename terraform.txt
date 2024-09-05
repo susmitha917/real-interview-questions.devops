@@ -174,7 +174,6 @@ local-exec: Runs a command on the local machine.
 remote-exec: Runs a command on a remote machine (requires SSH access).
 
 Use Cases:
-Post-deployment Tasks: Execute tasks that need to be run after resources are created.
 Custom Automation: Automate tasks that do not fit within traditional resource definitions.
 Workarounds: Handle situations where Terraform’s native resources do not cover specific needs.
 
@@ -458,6 +457,3 @@ Use Workspaces for managing different environments or stages.
 Track Terraform CLI Versions to ensure consistency.
 
 
-3.State File Versioning:
-Remote Backends: Use remote state storage (e.g., AWS S3) with versioning enabled to manage and recover state file versions.
-4.Workspace Versions:

@@ -2,8 +2,8 @@ What are pipeline stages in your organization?
 Here are the typical stages in a CI/CD pipeline, described concisely:
 
 Source Stage:
-
 Fetch Code: Pull the latest code from the version control system.
+
 Build Stage:
 Compile and Package: Build the application and package it for deployment.
 

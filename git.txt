@@ -223,6 +223,8 @@ Purpose: Create a new commit that undoes the changes of a specific commit, prese
 Command:git revert <commit>
 Usage: Safe way to undo changes without altering commit history.
 
-GIT SQUASH, STASH, CHERRY PICK
+GIT SQUASH, STASH, CHERRY PICK:
 
-
+Git Squash: Combines multiple commits into one. Typically used in an interactive rebase (git rebase -i <commit>) to clean up commit history before merging.
+Git Stash: Temporarily saves changes without committing them. Use git stash to store, and git stash pop to apply the stashed changes.
+Git Cherry Pick: Applies a specific commit from one branch to another. Use git cherry-pick <commit-hash> to selectively integrate changes from a different branch.
